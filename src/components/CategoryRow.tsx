@@ -1,5 +1,17 @@
+import type { ReactNode } from 'react';
+import type { CategoryKey } from '../lib/categories';
 import { CATEGORIES } from '../lib/categories';
 import { formatCompactINR, formatINR, pct } from '../lib/format';
+
+interface Props {
+  categoryKey: CategoryKey;
+  amount: number;
+  total: number;
+  showPercent?: boolean;
+  compact?: boolean;
+  trailing?: ReactNode;
+  onClick?: () => void;
+}
 
 export default function CategoryRow({
   categoryKey,
@@ -9,7 +21,7 @@ export default function CategoryRow({
   compact = false,
   trailing,
   onClick,
-}) {
+}: Props) {
   const cat = CATEGORIES.find((c) => c.key === categoryKey);
   if (!cat) return null;
   const Wrapper = onClick ? 'button' : 'div';

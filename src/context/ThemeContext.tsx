@@ -1,22 +1,37 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 
-const ThemeContext = createContext(null);
+export type ThemeMode = 'light' | 'dark' | 'system';
+type ResolvedTheme = 'light' | 'dark';
+
+interface ThemeContextValue {
+  mode: ThemeMode;
+  resolved: ResolvedTheme;
+  setMode: (mode: ThemeMode) => void;
+  cycle: () => void;
+}
+
+const ThemeContext = createContext<ThemeContextValue | null>(null);
 const STORAGE_KEY = 'plan.theme';
 
-const getSystem = () =>
+const getSystem = (): ResolvedTheme =>
   typeof window !== 'undefined' &&
   window.matchMedia('(prefers-color-scheme: dark)').matches
     ? 'dark'
     : 'light';
 
-const resolve = (mode) => (mode === 'system' ? getSystem() : mode);
-
-export function ThemeProvider({ children }) {
-  const [mode, setMode] = useState(() => {
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [mode, setMode] = useState<ThemeMode>(() => {
     if (typeof window === 'undefined') return 'system';
-    return localStorage.getItem(STORAGE_KEY) || 'system';
+    return (localStorage.getItem(STORAGE_KEY) as ThemeMode) || 'system';
   });
-  const [systemTheme, setSystemTheme] = useState(getSystem);
+  const [systemTheme, setSystemTheme] = useState<ResolvedTheme>(getSystem);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
@@ -25,7 +40,7 @@ export function ThemeProvider({ children }) {
     return () => mq.removeEventListener('change', onChange);
   }, []);
 
-  const resolved = mode === 'system' ? systemTheme : mode;
+  const resolved: ResolvedTheme = mode === 'system' ? systemTheme : mode;
 
   useEffect(() => {
     const root = document.documentElement;
@@ -38,7 +53,7 @@ export function ThemeProvider({ children }) {
     localStorage.setItem(STORAGE_KEY, mode);
   }, [mode]);
 
-  const value = useMemo(
+  const value = useMemo<ThemeContextValue>(
     () => ({
       mode,
       resolved,
@@ -54,7 +69,7 @@ export function ThemeProvider({ children }) {
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
-export function useTheme() {
+export function useTheme(): ThemeContextValue {
   const ctx = useContext(ThemeContext);
   if (!ctx) throw new Error('useTheme must be used inside ThemeProvider');
   return ctx;

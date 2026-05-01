@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import AppHeader from '../components/AppHeader';
 import CategoryInput from '../components/CategoryInput';
@@ -11,13 +11,15 @@ import { CATEGORIES, totalExpenses } from '../lib/categories';
 import { formatINR } from '../lib/format';
 import { labelFromId } from '../lib/monthId';
 
+type ExpenseFields = Record<string, number | string>;
+
 export default function EditMonthPage() {
-  const { monthId } = useParams();
+  const { monthId } = useParams<{ monthId: string }>();
   const navigate = useNavigate();
   const { month, loading, error, save } = useMonth(monthId);
 
-  const [salary, setSalary] = useState('');
-  const [expenses, setExpenses] = useState({
+  const [salary, setSalary] = useState<number | string>('');
+  const [expenses, setExpenses] = useState<ExpenseFields>({
     rent: '',
     food: '',
     travel: '',
@@ -25,18 +27,18 @@ export default function EditMonthPage() {
     misc: '',
   });
   const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState(null);
+  const [saveError, setSaveError] = useState<Error | null>(null);
   const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
     if (month) {
       setSalary(month.salary || '');
       setExpenses({
-        rent: month.expenses?.rent || '',
-        food: month.expenses?.food || '',
+        rent:   month.expenses?.rent   || '',
+        food:   month.expenses?.food   || '',
         travel: month.expenses?.travel || '',
-        bills: month.expenses?.bills || '',
-        misc: month.expenses?.misc || '',
+        bills:  month.expenses?.bills  || '',
+        misc:   month.expenses?.misc   || '',
       });
     }
   }, [month]);
@@ -45,7 +47,7 @@ export default function EditMonthPage() {
     () =>
       Object.fromEntries(
         Object.entries(expenses).map(([k, v]) => [k, Number(v) || 0])
-      ),
+      ) as Record<string, number>,
     [expenses]
   );
   const total = totalExpenses(numericExpenses);
@@ -53,28 +55,37 @@ export default function EditMonthPage() {
   const left = numericSalary - total;
   const overBudget = left < 0;
 
-  const handleSalary = (e) => {
+  const handleSalary = (e: ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/[^\d]/g, '');
     setSalary(raw === '' ? '' : Number(raw));
   };
 
   const handleSave = async () => {
+    if (!monthId) return;
     setSaving(true);
     setSaveError(null);
     try {
       await save({
         monthId,
         salary: numericSalary,
-        expenses: numericExpenses,
+        expenses: {
+          rent:   numericExpenses['rent']   || 0,
+          food:   numericExpenses['food']   || 0,
+          travel: numericExpenses['travel'] || 0,
+          bills:  numericExpenses['bills']  || 0,
+          misc:   numericExpenses['misc']   || 0,
+        },
       });
       setShowToast(true);
       setTimeout(() => navigate(-1), 600);
     } catch (err) {
-      setSaveError(err);
+      setSaveError(err instanceof Error ? err : new Error(String(err)));
     } finally {
       setSaving(false);
     }
   };
+
+  const label = monthId ? labelFromId(monthId) : '';
 
   return (
     <div className="min-h-dvh pb-32">
@@ -92,11 +103,11 @@ export default function EditMonthPage() {
             </svg>
             Back
           </button>
-          <span className="label-eyebrow">{labelFromId(monthId)}</span>
+          <span className="label-eyebrow">{label}</span>
         </div>
 
         <h1 className="mt-4 text-3xl font-semibold tracking-tight">
-          Plan {labelFromId(monthId)}.
+          Plan {label}.
         </h1>
         <p className="mt-1 text-sm text-muted-light dark:text-muted-dark">
           Set your salary and allocate each category. Numbers update live.

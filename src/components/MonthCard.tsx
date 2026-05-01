@@ -1,9 +1,15 @@
 import { Link } from 'react-router-dom';
+import type { MonthData } from '../firebase/budget';
 import { CATEGORIES, totalExpenses } from '../lib/categories';
 import { formatINR, pct } from '../lib/format';
 import { labelFromId } from '../lib/monthId';
 
-export default function MonthCard({ month, isCurrent }) {
+interface Props {
+  month: MonthData;
+  isCurrent?: boolean;
+}
+
+export default function MonthCard({ month, isCurrent }: Props) {
   const salary = Number(month?.salary) || 0;
   const total = totalExpenses(month?.expenses);
   const left = salary - total;

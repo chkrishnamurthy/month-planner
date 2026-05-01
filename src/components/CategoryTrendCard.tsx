@@ -1,7 +1,13 @@
+import type { CategoryKey } from '../lib/categories';
 import { CATEGORIES } from '../lib/categories';
 import { formatCompactINR } from '../lib/format';
 
-export default function CategoryTrendCard({ categoryKey, series }) {
+interface Props {
+  categoryKey: CategoryKey;
+  series: number[];
+}
+
+export default function CategoryTrendCard({ categoryKey, series }: Props) {
   const cat = CATEGORIES.find((c) => c.key === categoryKey);
   if (!cat) return null;
   const latest = series[series.length - 1] || 0;

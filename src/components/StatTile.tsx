@@ -1,4 +1,13 @@
-export default function StatTile({ label, value, accent = false, sub }) {
+import type { ReactNode } from 'react';
+
+interface Props {
+  label: string;
+  value: ReactNode;
+  accent?: boolean;
+  sub?: ReactNode;
+}
+
+export default function StatTile({ label, value, accent = false, sub }: Props) {
   return (
     <div
       className={`rounded-3xl p-5 ${

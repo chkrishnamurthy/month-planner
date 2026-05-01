@@ -1,9 +1,17 @@
+import type { ChangeEvent } from 'react';
+import type { CategoryKey } from '../lib/categories';
 import { CATEGORIES } from '../lib/categories';
 
-export default function CategoryInput({ categoryKey, value, onChange }) {
+interface Props {
+  categoryKey: CategoryKey;
+  value: number | string;
+  onChange: (value: number | string) => void;
+}
+
+export default function CategoryInput({ categoryKey, value, onChange }: Props) {
   const cat = CATEGORIES.find((c) => c.key === categoryKey);
   if (!cat) return null;
-  const handle = (e) => {
+  const handle = (e: ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/[^\d]/g, '');
     onChange(raw === '' ? '' : Number(raw));
   };

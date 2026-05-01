@@ -1,6 +1,13 @@
+import type { ReactElement } from 'react';
 import { NavLink } from 'react-router-dom';
 
-const items = [
+interface NavItem {
+  to: string;
+  label: string;
+  icon: (active: boolean) => ReactElement;
+}
+
+const items: NavItem[] = [
   {
     to: '/',
     label: 'Plan',

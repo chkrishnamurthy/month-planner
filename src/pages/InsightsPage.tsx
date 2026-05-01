@@ -5,13 +5,24 @@ import CategoryTrendCard from '../components/CategoryTrendCard';
 import ErrorBanner from '../components/ErrorBanner';
 import Spinner from '../components/Spinner';
 import TotalAllocatedBars from '../components/TotalAllocatedBars';
+import { useAuth } from '../context/AuthContext';
 import { useMonths } from '../hooks/useMonths';
 import { CATEGORIES, totalExpenses } from '../lib/categories';
 import { formatCompactINR } from '../lib/format';
 import { currentMonthId, labelFromId, lastNMonthIds, shortLabelFromId } from '../lib/monthId';
+import type { Expenses } from '../lib/categories';
+
+interface SixMonthEntry {
+  id: string;
+  label: string;
+  total: number;
+  salary: number;
+  expenses: Partial<Expenses>;
+}
 
 export default function InsightsPage() {
-  const { months, loading, error } = useMonths();
+  const { months } = useMonths();
+  const { loading, error } = useMonths();
 
   const cur = currentMonthId();
   const sixIds = useMemo(() => lastNMonthIds(6), []);
@@ -19,7 +30,7 @@ export default function InsightsPage() {
     () => Object.fromEntries(months.map((m) => [m.monthId, m])),
     [months]
   );
-  const six = useMemo(
+  const six = useMemo<SixMonthEntry[]>(
     () =>
       sixIds.map((id) => {
         const m = byId[id];
@@ -126,7 +137,7 @@ export default function InsightsPage() {
               </div>
             </section>
 
-            <SignOutRow />
+            <ProfileRow />
           </>
         )}
       </div>
@@ -135,12 +146,8 @@ export default function InsightsPage() {
   );
 }
 
-function SignOutRow() {
-  // imported lazily to avoid circular look; just inline:
-  // (kept here to keep bottom of insights as a natural place for sign out)
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { useAuth } = require('../context/AuthContext');
-  const { signOut, user } = useAuth();
+function ProfileRow() {
+  const { user, signOut } = useAuth();
   return (
     <section className="mt-6 card p-5 flex items-center gap-3">
       {user?.photoURL ? (

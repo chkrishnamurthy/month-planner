@@ -1,9 +1,14 @@
 import { useMemo } from 'react';
 import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts';
+import type { MonthData } from '../firebase/budget';
 import { CATEGORIES, totalExpenses } from '../lib/categories';
 import { formatCompactINR } from '../lib/format';
 
-export default function AllocationDonut({ month }) {
+interface Props {
+  month: MonthData;
+}
+
+export default function AllocationDonut({ month }: Props) {
   const salary = Number(month?.salary) || 0;
   const total = totalExpenses(month?.expenses);
   const left = Math.max(0, salary - total);

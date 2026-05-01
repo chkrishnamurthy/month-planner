@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react';
 
-export default function Toast({ message, show, onDone }) {
+interface Props {
+  message: string;
+  show: boolean;
+  onDone?: () => void;
+}
+
+export default function Toast({ message, show, onDone }: Props) {
   const [visible, setVisible] = useState(show);
   useEffect(() => {
     if (show) {

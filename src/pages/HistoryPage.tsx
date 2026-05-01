@@ -15,10 +15,17 @@ import {
   previousMonthId,
 } from '../lib/monthId';
 
-function NewMonthSheet({ open, onClose, existingIds, onCreated }) {
+interface NewMonthSheetProps {
+  open: boolean;
+  onClose: () => void;
+  existingIds: string[];
+  onCreated: (id: string) => void;
+}
+
+function NewMonthSheet({ open, onClose, existingIds, onCreated }: NewMonthSheetProps) {
   const { user } = useAuth();
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<Error | null>(null);
 
   const cur = currentMonthId();
   const candidateNext = nextMonthId(cur);
@@ -34,7 +41,6 @@ function NewMonthSheet({ open, onClose, existingIds, onCreated }) {
   const sourceId = existingIds[0];
 
   const handleCreate = async () => {
-    if (!user) return;
     setBusy(true);
     setError(null);
     try {
@@ -49,7 +55,7 @@ function NewMonthSheet({ open, onClose, existingIds, onCreated }) {
       }
       onCreated(selected);
     } catch (err) {
-      setError(err);
+      setError(err instanceof Error ? err : new Error(String(err)));
     } finally {
       setBusy(false);
     }

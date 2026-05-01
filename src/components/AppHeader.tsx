@@ -1,7 +1,11 @@
 import { Link } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
 
-export default function AppHeader({ section }) {
+interface Props {
+  section?: string;
+}
+
+export default function AppHeader({ section }: Props) {
   return (
     <header className="flex items-center justify-between py-5">
       <Link to="/" className="flex items-center gap-2.5 group">

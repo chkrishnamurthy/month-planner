@@ -1,7 +1,12 @@
-export default function ErrorBanner({ error, onRetry }) {
+interface Props {
+  error?: Error | string | null;
+  onRetry?: () => void;
+}
+
+export default function ErrorBanner({ error, onRetry }: Props) {
   if (!error) return null;
   const message =
-    error?.message || (typeof error === 'string' ? error : 'Something went wrong.');
+    (error as Error)?.message || (typeof error === 'string' ? error : 'Something went wrong.');
   return (
     <div className="rounded-2xl border border-red-200 dark:border-red-900/60 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 px-4 py-3 text-sm flex items-center justify-between gap-3">
       <span>{message}</span>

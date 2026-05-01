@@ -1,6 +1,8 @@
+import type { ReactElement } from 'react';
+import type { ThemeMode } from '../context/ThemeContext';
 import { useTheme } from '../context/ThemeContext';
 
-const ICONS = {
+const ICONS: Record<ThemeMode, ReactElement> = {
   light: (
     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="4" />
@@ -20,7 +22,11 @@ const ICONS = {
   ),
 };
 
-const NEXT_LABEL = { light: 'Dark', dark: 'System', system: 'Light' };
+const NEXT_LABEL: Record<ThemeMode, string> = {
+  light: 'Dark',
+  dark: 'System',
+  system: 'Light',
+};
 
 export default function ThemeToggle() {
   const { mode, cycle } = useTheme();

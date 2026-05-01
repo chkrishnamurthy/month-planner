@@ -1,8 +1,14 @@
+import type { MonthData } from '../firebase/budget';
 import { formatINR, pct } from '../lib/format';
 import { remaining, totalExpenses } from '../lib/categories';
 import { dayOfMonth, daysInMonth } from '../lib/monthId';
 
-export default function RemainingCard({ month, isCurrent }) {
+interface Props {
+  month: MonthData;
+  isCurrent?: boolean;
+}
+
+export default function RemainingCard({ month, isCurrent }: Props) {
   const salary = Number(month?.salary) || 0;
   const total = totalExpenses(month?.expenses);
   const left = remaining(month);
