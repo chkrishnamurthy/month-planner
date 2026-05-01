@@ -1,50 +1,20 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import {
-  onAuthStateChanged,
-  signInWithPopup,
-  signOut as fbSignOut,
-} from 'firebase/auth';
-import { auth, googleProvider } from '../firebase/config';
+import { createContext, useContext, useMemo } from 'react';
 
 const AuthContext = createContext(null);
 
+// Mock user — no Firebase, no login required
+const MOCK_USER = { uid: 'local-user', displayName: 'You', email: 'local@planner.app' };
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const unsub = onAuthStateChanged(
-      auth,
-      (u) => {
-        setUser(u);
-        setLoading(false);
-      },
-      (err) => {
-        setError(err);
-        setLoading(false);
-      }
-    );
-    return unsub;
-  }, []);
-
   const value = useMemo(
     () => ({
-      user,
-      loading,
-      error,
-      signInWithGoogle: async () => {
-        setError(null);
-        try {
-          await signInWithPopup(auth, googleProvider);
-        } catch (err) {
-          setError(err);
-          throw err;
-        }
-      },
-      signOut: () => fbSignOut(auth),
+      user: MOCK_USER,
+      loading: false,
+      error: null,
+      signInWithGoogle: async () => {},
+      signOut: async () => {},
     }),
-    [user, loading, error]
+    []
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
