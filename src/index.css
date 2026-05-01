@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-bg-light dark:bg-bg-dark text-neutral-900 dark:text-neutral-100;
+    @apply font-sans antialiased;
+    min-height: 100dvh;
+  }
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-card-light dark:bg-card-dark rounded-3xl border border-line-light dark:border-line-dark;
+  }
+  .card-hero {
+    @apply bg-hero text-white rounded-3xl;
+  }
+  .pill {
+    @apply inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition active:scale-[0.98];
+  }
+  .pill-ghost {
+    @apply pill bg-card-light dark:bg-card-dark border border-line-light dark:border-line-dark text-neutral-900 dark:text-neutral-100;
+  }
+  .pill-accent {
+    @apply pill bg-accent text-accent-ink hover:brightness-95;
+  }
+  .label-eyebrow {
+    @apply text-[11px] font-medium tracking-[0.14em] uppercase text-muted-light dark:text-muted-dark;
+  }
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+}
