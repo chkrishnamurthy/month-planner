@@ -13,6 +13,7 @@ import {
   signOut as fbSignOut,
 } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase/config';
+import { getApiBaseUrl } from '../lib/env';
 
 interface AuthContextValue {
   user: User | null;
@@ -24,7 +25,7 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
+const API = getApiBaseUrl();
 
 async function syncUserToDB(user: User): Promise<void> {
   try {

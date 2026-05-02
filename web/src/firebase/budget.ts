@@ -1,4 +1,5 @@
 import { auth } from './config';
+import { getApiBaseUrl } from '../lib/env';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -35,7 +36,7 @@ export const emptyMonth = (monthId: string): MonthData => ({
 
 // ─── HTTP client ──────────────────────────────────────────────────────────────
 
-const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
+const API = getApiBaseUrl();
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const token = await auth.currentUser?.getIdToken();

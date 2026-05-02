@@ -53,9 +53,14 @@ VITE_FIREBASE_PROJECT_ID=your-project-id
 VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
 VITE_FIREBASE_MESSAGING_SENDER_ID=000000000000
 VITE_FIREBASE_APP_ID=1:000000000000:web:xxxxxxxxxxxxxxxx
+VITE_API_URL=http://localhost:3001
 ```
 
 Find these in Firebase Console → Project Settings → General tab.
+
+For production deploys, set env vars in your hosting provider (do not commit secrets):
+- Frontend (`web`): use `web/.env.production.example` as a checklist and set values in Netlify UI.
+- Backend (`api`): set `CORS_ORIGIN` to your frontend origin (e.g. `https://month-plan.netlify.app`) and keep local `.env` separate.
 
 ### Step 4: Firestore Security Rules
 
