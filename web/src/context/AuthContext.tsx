@@ -24,6 +24,19 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
+
+async function syncUserToDB(user: User): Promise<void> {
+  try {
+    const token = await user.getIdToken();
+    await fetch(`${API}/users/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } catch {
+    // non-blocking — app still works if sync fails
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser]       = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -35,6 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       (u) => {
         setUser(u);
         setLoading(false);
+        if (u) syncUserToDB(u);   // save/update user in Neon on every login + page reload
       },
       (err) => {
         setError(err);
