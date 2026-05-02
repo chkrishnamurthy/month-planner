@@ -17,6 +17,16 @@ export interface MonthData {
   expenses: Record<string, number>; // categoryId → amount
 }
 
+export interface UserProfile {
+  id: string;
+  email: string;
+  displayName: string | null;
+  photoURL: string | null;
+  lastLoginAt: string;
+  createdAt: string;
+  _count: { months: number };
+}
+
 export const emptyMonth = (monthId: string): MonthData => ({
   monthId,
   salary: 0,
@@ -94,4 +104,8 @@ export async function copyFromMonth(
     method: 'POST',
     body: JSON.stringify({ toMonthId: toId }),
   });
+}
+
+export async function getUserProfile(): Promise<UserProfile> {
+  return request<UserProfile>('/users/me');
 }

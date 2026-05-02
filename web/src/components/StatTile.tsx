@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import Skeleton from './Skeleton';
 
 interface Props {
   label: string;
@@ -35,6 +36,22 @@ export default function StatTile({ label, value, accent = false, sub }: Props) {
           {sub}
         </div>
       )}
+    </div>
+  );
+}
+
+export function StatTileSkeleton({ accent = false }: { accent?: boolean }) {
+  return (
+    <div
+      className={`rounded-3xl p-5 ${
+        accent
+          ? 'bg-accent'
+          : 'bg-card-light dark:bg-card-dark border border-line-light dark:border-line-dark'
+      }`}
+    >
+      <Skeleton className="h-3 w-16 mb-2" />
+      <Skeleton className="h-8 w-20 mb-1" />
+      <Skeleton className="h-3 w-12" />
     </div>
   );
 }

@@ -37,6 +37,15 @@ const items: NavItem[] = [
       </svg>
     ),
   },
+  {
+    to: '/profile',
+    label: 'Profile',
+    icon: (active) => (
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth={active ? 2.4 : 1.8} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4 0-7 2-7 4v2h14v-2c0-2-3-4-7-4Z" />
+      </svg>
+    ),
+  },
 ];
 
 export default function BottomNav() {
@@ -45,7 +54,7 @@ export default function BottomNav() {
       className="fixed bottom-0 inset-x-0 z-30 border-t border-line-light dark:border-line-dark bg-bg-light/85 dark:bg-bg-dark/85 backdrop-blur-md md:hidden"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
-      <div className="mx-auto max-w-xl px-4 grid grid-cols-3">
+      <div className="mx-auto max-w-xl px-4 grid grid-cols-4">
         {items.map((it) => (
           <NavLink
             key={it.to}

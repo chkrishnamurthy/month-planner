@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppHeader from '../components/AppHeader';
 import ErrorBanner from '../components/ErrorBanner';
-import MonthCard from '../components/MonthCard';
+import MonthCard, { MonthCardSkeleton } from '../components/MonthCard';
 import Spinner from '../components/Spinner';
 import { useAuth } from '../context/AuthContext';
 import { useCategories } from '../hooks/useCategories';
@@ -155,8 +155,8 @@ export default function HistoryPage() {
   const loading = monthsLoading || catsLoading;
 
   return (
-    <div className="min-h-dvh pb-28">
-      <div className="mx-auto max-w-xl lg:max-w-5xl xl:max-w-7xl px-5">
+    <div className="min-h-dvh pb-28 md:pb-10">
+      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 3xl:px-16">
         <AppHeader section="02 · History" />
 
         <div className="mt-4 flex items-end justify-between gap-4">
@@ -187,8 +187,10 @@ export default function HistoryPage() {
         )}
 
         {loading ? (
-          <div className="mt-10 flex justify-center text-muted-light dark:text-muted-dark">
-            <Spinner size={28} />
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 3xl:grid-cols-7 gap-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <MonthCardSkeleton key={i} />
+            ))}
           </div>
         ) : error ? null : months.length === 0 ? (
           <div className="mt-10 card p-6 text-center">
@@ -203,7 +205,7 @@ export default function HistoryPage() {
             </button>
           </div>
         ) : (
-          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-3">
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 3xl:grid-cols-7 gap-3">
             {months.map((m) => (
               <MonthCard
                 key={m.monthId}

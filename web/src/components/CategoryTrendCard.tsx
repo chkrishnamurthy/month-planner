@@ -1,5 +1,6 @@
 import type { Category } from '../firebase/budget';
 import { formatCompactINR } from '../lib/format';
+import Skeleton from './Skeleton';
 
 interface Props {
   category: Category;
@@ -64,6 +65,32 @@ export default function CategoryTrendCard({ category, series }: Props) {
             />
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+export function CategoryTrendCardSkeleton() {
+  return (
+    <div className="card p-5">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <Skeleton className="w-9 h-9 rounded-xl shrink-0" />
+          <div className="min-w-0">
+            <Skeleton className="h-4 w-16 mb-1" />
+            <Skeleton className="h-5 w-12" />
+          </div>
+        </div>
+        <Skeleton className="h-3 w-8" />
+      </div>
+      <div className="mt-4 flex items-end gap-1.5 h-12">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Skeleton
+            key={i}
+            className="flex-1 rounded-md"
+            height={`${Math.random() * 60 + 20}%`}
+          />
+        ))}
       </div>
     </div>
   );

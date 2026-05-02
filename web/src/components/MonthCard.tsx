@@ -3,6 +3,7 @@ import type { Category, MonthData } from '../firebase/budget';
 import { totalExpenses } from '../lib/categories';
 import { formatINR, pct } from '../lib/format';
 import { labelFromId } from '../lib/monthId';
+import Skeleton from './Skeleton';
 
 interface Props {
   month: MonthData;
@@ -68,5 +69,25 @@ export default function MonthCard({ month, categories, isCurrent }: Props) {
         </div>
       )}
     </Link>
+  );
+}
+
+export function MonthCardSkeleton() {
+  return (
+    <div className="card p-5 sm:p-6">
+      <div className="flex items-start justify-between gap-3">
+        <Skeleton className="h-4 w-20" />
+        <Skeleton className="h-4 w-16 rounded-full" />
+      </div>
+      <Skeleton className="h-8 w-24 mt-1" />
+
+      <Skeleton className="h-3 w-8 mt-4" />
+      <div className="flex items-end justify-between gap-2 mt-1">
+        <Skeleton className="h-5 w-16" />
+        <Skeleton className="h-3 w-12" />
+      </div>
+      <Skeleton className="h-1.5 w-full mt-3 rounded-full" />
+      <Skeleton className="h-1 w-full mt-3 rounded-full" />
+    </div>
   );
 }

@@ -1,5 +1,6 @@
 import type { ChangeEvent } from 'react';
 import type { Category } from '../firebase/budget';
+import Skeleton from './Skeleton';
 
 interface Props {
   category: Category;
@@ -34,5 +35,15 @@ export default function CategoryInput({ category, value, onChange }: Props) {
         />
       </span>
     </label>
+  );
+}
+
+export function CategoryInputSkeleton() {
+  return (
+    <div className="flex items-center gap-3 py-3">
+      <Skeleton className="w-10 h-10 rounded-xl shrink-0" />
+      <Skeleton className="flex-1 h-4" />
+      <Skeleton className="h-8 w-24 rounded-2xl" />
+    </div>
   );
 }

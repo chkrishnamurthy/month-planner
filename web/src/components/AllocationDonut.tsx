@@ -3,6 +3,7 @@ import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import type { Category, MonthData } from '../firebase/budget';
 import { totalExpenses } from '../lib/categories';
 import { formatCompactINR } from '../lib/format';
+import Skeleton from './Skeleton';
 
 interface Props {
   month: MonthData;
@@ -52,6 +53,19 @@ export default function AllocationDonut({ month, categories }: Props) {
         <div className="text-xs text-muted-light dark:text-muted-dark num">
           of {formatCompactINR(salary)}
         </div>
+      </div>
+    </div>
+  );
+}
+
+export function AllocationDonutSkeleton() {
+  return (
+    <div className="relative w-full aspect-square max-w-[260px] mx-auto">
+      <Skeleton className="w-full h-full rounded-full" />
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+        <Skeleton className="h-3 w-8 mb-1" />
+        <Skeleton className="h-6 w-16 mb-1" />
+        <Skeleton className="h-3 w-12" />
       </div>
     </div>
   );

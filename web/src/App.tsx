@@ -6,6 +6,7 @@ import DashboardPage  from './pages/DashboardPage';
 import EditMonthPage  from './pages/EditMonthPage';
 import HistoryPage    from './pages/HistoryPage';
 import InsightsPage   from './pages/InsightsPage';
+import ProfilePage    from './pages/ProfilePage';
 import LoginPage      from './pages/LoginPage';
 
 import Layout from './components/Layout';
@@ -43,6 +44,10 @@ export default function App() {
       <Route
         path="/insights"
         element={<PrivateRoute><InsightsPage /></PrivateRoute>}
+      />
+      <Route
+        path="/profile"
+        element={<PrivateRoute><ProfilePage /></PrivateRoute>}
       />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

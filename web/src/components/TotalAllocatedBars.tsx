@@ -8,6 +8,7 @@ import {
   YAxis,
 } from 'recharts';
 import { useTheme } from '../context/ThemeContext';
+import Skeleton from './Skeleton';
 
 interface BarDatum {
   id: string;
@@ -58,6 +59,22 @@ export default function TotalAllocatedBars({ data, currentId }: Props) {
           </Bar>
         </BarChart>
       </ResponsiveContainer>
+    </div>
+  );
+}
+
+export function TotalAllocatedBarsSkeleton() {
+  return (
+    <div className="w-full h-60 flex items-end justify-center gap-2 pb-8">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="flex flex-col items-center gap-2">
+          <Skeleton
+            className="w-6 rounded-md"
+            height={`${Math.random() * 120 + 40}px`}
+          />
+          <Skeleton className="h-3 w-8" />
+        </div>
+      ))}
     </div>
   );
 }
