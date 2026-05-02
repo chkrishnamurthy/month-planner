@@ -1,15 +1,15 @@
 import { Link, useNavigate } from 'react-router-dom';
 import AllocationDonut from '../components/AllocationDonut';
 import AppHeader from '../components/AppHeader';
-
 import CategoryRow from '../components/CategoryRow';
 import ErrorBanner from '../components/ErrorBanner';
 import RemainingCard from '../components/RemainingCard';
 import Spinner from '../components/Spinner';
 import StatTile from '../components/StatTile';
 import { useAuth } from '../context/AuthContext';
+import { useCategories } from '../hooks/useCategories';
 import { useMonth } from '../hooks/useMonth';
-import { CATEGORIES, totalExpenses } from '../lib/categories';
+import { totalExpenses } from '../lib/categories';
 import { formatCompactINR, pct } from '../lib/format';
 import { currentMonthId, daysInMonth, dayOfMonth, labelFromId, todayLabel } from '../lib/monthId';
 
@@ -17,7 +17,8 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const monthId = currentMonthId();
-  const { month, loading, error } = useMonth(monthId);
+  const { month, loading: monthLoading, error } = useMonth(monthId);
+  const { categories, loading: catsLoading } = useCategories();
 
   const firstName = user?.displayName?.split(' ')[0] || 'there';
   const total = totalExpenses(month?.expenses);
@@ -26,6 +27,7 @@ export default function DashboardPage() {
   const saveRate = salary > 0 ? Math.round((left / salary) * 100) : 0;
   const days = daysInMonth(monthId);
   const dayLeft = Math.max(0, days - dayOfMonth());
+  const loading = monthLoading || catsLoading;
 
   return (
     <div className="min-h-dvh pb-28">
@@ -82,13 +84,13 @@ export default function DashboardPage() {
                   </div>
 
                   <div className="mt-3 sm:flex sm:items-center sm:gap-6 lg:flex-col lg:items-start xl:flex-row xl:items-center">
-                    <AllocationDonut month={month} />
+                    <AllocationDonut month={month} categories={categories} />
                     <ul className="mt-2 sm:mt-0 flex-1 w-full divide-y divide-line-light dark:divide-line-dark">
-                      {CATEGORIES.map((c) => (
-                        <li key={c.key}>
+                      {categories.map((cat) => (
+                        <li key={cat.id}>
                           <CategoryRow
-                            categoryKey={c.key}
-                            amount={month.expenses[c.key]}
+                            category={cat}
+                            amount={month.expenses[cat.id] || 0}
                             total={total}
                             showPercent
                             compact
@@ -127,11 +129,11 @@ export default function DashboardPage() {
                     </Link>
                   </div>
                   <ul className="divide-y divide-line-light dark:divide-line-dark">
-                    {CATEGORIES.map((c) => (
-                      <li key={c.key} className="px-2">
+                    {categories.map((cat) => (
+                      <li key={cat.id} className="px-2">
                         <CategoryRow
-                          categoryKey={c.key}
-                          amount={month.expenses[c.key]}
+                          category={cat}
+                          amount={month.expenses[cat.id] || 0}
                           total={total}
                           compact
                           onClick={() => navigate(`/edit/${monthId}`)}

@@ -2,18 +2,10 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 import * as monthService from '../services/monthService';
 
-const expensesSchema = z.object({
-  rent:   z.number().min(0).default(0),
-  food:   z.number().min(0).default(0),
-  travel: z.number().min(0).default(0),
-  bills:  z.number().min(0).default(0),
-  misc:   z.number().min(0).default(0),
-});
-
 export const saveMonthSchema = z.object({
   monthId:  z.string().regex(/^\d{4}-\d{2}$/, 'monthId must be YYYY-MM'),
   salary:   z.number().min(0).default(0),
-  expenses: expensesSchema.default({}),
+  expenses: z.record(z.string(), z.number().min(0)).default({}),
 });
 
 export async function getMonth(req: Request, res: Response): Promise<void> {

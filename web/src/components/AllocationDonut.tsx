@@ -1,29 +1,30 @@
 import { useMemo } from 'react';
 import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts';
-import type { MonthData } from '../firebase/budget';
-import { CATEGORIES, totalExpenses } from '../lib/categories';
+import type { Category, MonthData } from '../firebase/budget';
+import { totalExpenses } from '../lib/categories';
 import { formatCompactINR } from '../lib/format';
 
 interface Props {
   month: MonthData;
+  categories: Category[];
 }
 
-export default function AllocationDonut({ month }: Props) {
+export default function AllocationDonut({ month, categories }: Props) {
   const salary = Number(month?.salary) || 0;
   const total = totalExpenses(month?.expenses);
   const left = Math.max(0, salary - total);
 
   const data = useMemo(() => {
-    const cats = CATEGORIES.map((c) => ({
-      name: c.label,
-      value: Number(month?.expenses?.[c.key]) || 0,
+    const cats = categories.map((c) => ({
+      name: c.name,
+      value: Number(month?.expenses?.[c.id]) || 0,
       color: c.color,
     })).filter((d) => d.value > 0);
     if (left > 0 || cats.length === 0) {
       cats.push({ name: 'Left', value: Math.max(left, 1), color: '#2A2A2A' });
     }
     return cats;
-  }, [month, left]);
+  }, [month, categories, left]);
 
   return (
     <div className="relative w-full aspect-square max-w-[260px] mx-auto">

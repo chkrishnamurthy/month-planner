@@ -1,15 +1,12 @@
-import type { CategoryKey } from '../lib/categories';
-import { CATEGORIES } from '../lib/categories';
+import type { Category } from '../firebase/budget';
 import { formatCompactINR } from '../lib/format';
 
 interface Props {
-  categoryKey: CategoryKey;
+  category: Category;
   series: number[];
 }
 
-export default function CategoryTrendCard({ categoryKey, series }: Props) {
-  const cat = CATEGORIES.find((c) => c.key === categoryKey);
-  if (!cat) return null;
+export default function CategoryTrendCard({ category, series }: Props) {
   const latest = series[series.length - 1] || 0;
   const prev = series[series.length - 2] || 0;
   const delta = prev > 0 ? Math.round(((latest - prev) / prev) * 100) : 0;
@@ -32,14 +29,14 @@ export default function CategoryTrendCard({ categoryKey, series }: Props) {
         <div className="flex items-center gap-2.5 min-w-0">
           <span
             className="w-9 h-9 rounded-xl grid place-items-center text-base shrink-0"
-            style={{ backgroundColor: `${cat.color}22`, color: cat.color }}
+            style={{ backgroundColor: `${category.color}22`, color: category.color }}
             aria-hidden
           >
-            {cat.emoji}
+            {category.emoji}
           </span>
           <div className="min-w-0">
             <div className="text-sm text-muted-light dark:text-muted-dark">
-              {cat.label}
+              {category.name}
             </div>
             <div className="text-lg font-semibold num">
               {formatCompactINR(latest)}
@@ -60,7 +57,7 @@ export default function CategoryTrendCard({ categoryKey, series }: Props) {
               key={i}
               className="flex-1 rounded-md"
               style={{
-                background: cat.color,
+                background: category.color,
                 opacity: isLast ? 1 : 0.25 + (0.75 * (i + 1)) / series.length * 0.6,
                 height: `${Math.max(8, (v / max) * 100)}%`,
               }}

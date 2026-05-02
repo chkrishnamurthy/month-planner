@@ -1,27 +1,27 @@
 import { useMemo } from 'react';
 import AppHeader from '../components/AppHeader';
-
 import CategoryTrendCard from '../components/CategoryTrendCard';
 import ErrorBanner from '../components/ErrorBanner';
 import Spinner from '../components/Spinner';
 import TotalAllocatedBars from '../components/TotalAllocatedBars';
 import { useAuth } from '../context/AuthContext';
+import { useCategories } from '../hooks/useCategories';
 import { useMonths } from '../hooks/useMonths';
-import { CATEGORIES, totalExpenses } from '../lib/categories';
+import { totalExpenses } from '../lib/categories';
 import { formatCompactINR } from '../lib/format';
 import { currentMonthId, labelFromId, lastNMonthIds, shortLabelFromId } from '../lib/monthId';
-import type { Expenses } from '../lib/categories';
 
 interface SixMonthEntry {
   id: string;
   label: string;
   total: number;
   salary: number;
-  expenses: Partial<Expenses>;
+  expenses: Record<string, number>;
 }
 
 export default function InsightsPage() {
-  const { months, loading, error } = useMonths();
+  const { months, loading: monthsLoading, error } = useMonths();
+  const { categories, loading: catsLoading } = useCategories();
 
   const cur = currentMonthId();
   const sixIds = useMemo(() => lastNMonthIds(6), []);
@@ -51,6 +51,7 @@ export default function InsightsPage() {
   const latestSpent = totalExpenses(latest?.expenses);
   const latestSaved = Math.max(0, latestSalary - latestSpent);
   const saveRate = latestSalary > 0 ? Math.round((latestSaved / latestSalary) * 100) : 0;
+  const loading = monthsLoading || catsLoading;
 
   return (
     <div className="min-h-dvh pb-28">
@@ -127,21 +128,23 @@ export default function InsightsPage() {
                 </div>
               </section>
 
-              <section>
-                <div className="flex items-baseline justify-between mb-3">
-                  <div className="text-sm font-semibold">Category trends</div>
-                  <div className="label-eyebrow">vs last month</div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {CATEGORIES.map((c) => (
-                    <CategoryTrendCard
-                      key={c.key}
-                      categoryKey={c.key}
-                      series={six.map((m) => Number(m.expenses?.[c.key]) || 0)}
-                    />
-                  ))}
-                </div>
-              </section>
+              {categories.length > 0 && (
+                <section>
+                  <div className="flex items-baseline justify-between mb-3">
+                    <div className="text-sm font-semibold">Category trends</div>
+                    <div className="label-eyebrow">vs last month</div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {categories.map((cat) => (
+                      <CategoryTrendCard
+                        key={cat.id}
+                        category={cat}
+                        series={six.map((m) => Number(m.expenses?.[cat.id]) || 0)}
+                      />
+                    ))}
+                  </div>
+                </section>
+              )}
 
               <div className="lg:hidden">
                 <ProfileRow />

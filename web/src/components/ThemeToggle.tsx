@@ -14,18 +14,11 @@ const ICONS: Record<ThemeMode, ReactElement> = {
       <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" />
     </svg>
   ),
-  system: (
-    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="4" width="18" height="12" rx="2" />
-      <path d="M8 20h8M12 16v4" />
-    </svg>
-  ),
 };
 
 const NEXT_LABEL: Record<ThemeMode, string> = {
   light: 'Dark',
-  dark: 'System',
-  system: 'Light',
+  dark: 'Light',
 };
 
 export default function ThemeToggle() {

@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from 'react';
 
-export type ThemeMode = 'light' | 'dark' | 'system';
+export type ThemeMode = 'light' | 'dark';
 type ResolvedTheme = 'light' | 'dark';
 
 interface ThemeContextValue {
@@ -20,48 +20,38 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 const STORAGE_KEY = 'plan.theme';
 
-const getSystem = (): ResolvedTheme =>
-  typeof window !== 'undefined' &&
-  window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? 'dark'
-    : 'light';
-
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<ThemeMode>(() => {
-    if (typeof window === 'undefined') return 'system';
-    return (localStorage.getItem(STORAGE_KEY) as ThemeMode) || 'system';
+    if (typeof window === 'undefined') return 'light';
+    return (localStorage.getItem(STORAGE_KEY) as ThemeMode) || 'light';
   });
-  const [systemTheme, setSystemTheme] = useState<ResolvedTheme>(getSystem);
 
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    const onChange = () => setSystemTheme(mq.matches ? 'dark' : 'light');
-    mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener('change', onChange);
-  }, []);
+  const resolved: ResolvedTheme = mode;
 
-  const resolved: ResolvedTheme = mode === 'system' ? systemTheme : mode;
-
+  // Update DOM immediately when resolved theme changes
   useEffect(() => {
     const root = document.documentElement;
-    if (resolved === 'dark') root.classList.add('dark');
-    else root.classList.remove('dark');
+    root.classList.toggle('dark', resolved === 'dark');
     root.style.colorScheme = resolved;
   }, [resolved]);
 
+  // Save mode to localStorage when it changes
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, mode);
   }, [mode]);
 
-  const value = useMemo<ThemeContextValue>(
+  // Create stable cycle function
+  const cycle = () =>
+    setMode((m) =>
+      m === 'light' ? 'dark' : 'light'
+    );
+
+  const value: ThemeContextValue = useMemo(
     () => ({
       mode,
       resolved,
       setMode,
-      cycle: () =>
-        setMode((m) =>
-          m === 'light' ? 'dark' : m === 'dark' ? 'system' : 'light'
-        ),
+      cycle,
     }),
     [mode, resolved]
   );

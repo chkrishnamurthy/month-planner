@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import AddCategoryModal from '../components/AddCategoryModal';
 import AppHeader from '../components/AppHeader';
 import CategoryInput from '../components/CategoryInput';
 import ErrorBanner from '../components/ErrorBanner';
 import FloatingSaveButton from '../components/FloatingSaveButton';
 import Spinner from '../components/Spinner';
 import Toast from '../components/Toast';
+import { useCategories } from '../hooks/useCategories';
 import { useMonth } from '../hooks/useMonth';
-import { CATEGORIES, totalExpenses } from '../lib/categories';
+import { totalExpenses } from '../lib/categories';
 import { formatINR } from '../lib/format';
 import { labelFromId } from '../lib/monthId';
 
@@ -17,29 +19,23 @@ export default function EditMonthPage() {
   const { monthId } = useParams<{ monthId: string }>();
   const navigate = useNavigate();
   const { month, loading, error, save } = useMonth(monthId);
+  const { categories, loading: catsLoading, createCategory } = useCategories();
 
   const [salary, setSalary] = useState<number | string>('');
-  const [expenses, setExpenses] = useState<ExpenseFields>({
-    rent: '',
-    food: '',
-    travel: '',
-    bills: '',
-    misc: '',
-  });
+  const [expenses, setExpenses] = useState<ExpenseFields>({});
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<Error | null>(null);
   const [showToast, setShowToast] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
     if (month) {
       setSalary(month.salary || '');
-      setExpenses({
-        rent:   month.expenses?.rent   || '',
-        food:   month.expenses?.food   || '',
-        travel: month.expenses?.travel || '',
-        bills:  month.expenses?.bills  || '',
-        misc:   month.expenses?.misc   || '',
-      });
+      const fields: ExpenseFields = {};
+      for (const [k, v] of Object.entries(month.expenses || {})) {
+        fields[k] = v || '';
+      }
+      setExpenses(fields);
     }
   }, [month]);
 
@@ -68,13 +64,7 @@ export default function EditMonthPage() {
       await save({
         monthId,
         salary: numericSalary,
-        expenses: {
-          rent:   numericExpenses['rent']   || 0,
-          food:   numericExpenses['food']   || 0,
-          travel: numericExpenses['travel'] || 0,
-          bills:  numericExpenses['bills']  || 0,
-          misc:   numericExpenses['misc']   || 0,
-        },
+        expenses: numericExpenses,
       });
       setShowToast(true);
       setTimeout(() => navigate(-1), 600);
@@ -86,6 +76,7 @@ export default function EditMonthPage() {
   };
 
   const label = monthId ? labelFromId(monthId) : '';
+  const isLoading = loading || catsLoading;
 
   return (
     <div className="min-h-dvh pb-32">
@@ -119,7 +110,7 @@ export default function EditMonthPage() {
           </div>
         )}
 
-        {loading ? (
+        {isLoading ? (
           <div className="mt-10 flex justify-center text-muted-light dark:text-muted-dark">
             <Spinner size={28} />
           </div>
@@ -172,28 +163,52 @@ export default function EditMonthPage() {
 
             <div className="mt-5 lg:mt-0">
               <section className="card p-2 sm:p-3">
-                <div className="px-3 pt-3 label-eyebrow">Categories</div>
+                <div className="flex items-center justify-between px-3 pt-3">
+                  <div className="label-eyebrow">Categories</div>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddModal(true)}
+                    className="pill-ghost !py-1 !px-2.5 text-xs flex items-center gap-1"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <path d="M12 5v14M5 12h14" />
+                    </svg>
+                    Add
+                  </button>
+                </div>
                 <ul className="divide-y divide-line-light dark:divide-line-dark">
-                  {CATEGORIES.map((c) => (
-                    <li key={c.key} className="px-2">
+                  {categories.map((cat) => (
+                    <li key={cat.id} className="px-2">
                       <CategoryInput
-                        categoryKey={c.key}
-                        value={expenses[c.key]}
+                        category={cat}
+                        value={expenses[cat.id] ?? ''}
                         onChange={(v) =>
-                          setExpenses((prev) => ({ ...prev, [c.key]: v }))
+                          setExpenses((prev) => ({ ...prev, [cat.id]: v }))
                         }
                       />
                     </li>
                   ))}
                 </ul>
+                {categories.length === 0 && (
+                  <p className="px-3 py-4 text-sm text-muted-light dark:text-muted-dark">
+                    No categories yet. Add one above.
+                  </p>
+                )}
               </section>
             </div>
           </div>
         )}
       </div>
 
-      <FloatingSaveButton onClick={handleSave} saving={saving} disabled={loading} />
+      <FloatingSaveButton onClick={handleSave} saving={saving} disabled={isLoading} />
       <Toast message="Saved" show={showToast} onDone={() => setShowToast(false)} />
+
+      <AddCategoryModal
+        open={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        existingNames={categories.map((c) => c.name)}
+        onCreate={async (data) => { await createCategory(data); }}
+      />
     </div>
   );
 }

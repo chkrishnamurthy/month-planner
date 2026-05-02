@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppHeader from '../components/AppHeader';
-
 import ErrorBanner from '../components/ErrorBanner';
 import MonthCard from '../components/MonthCard';
 import Spinner from '../components/Spinner';
 import { useAuth } from '../context/AuthContext';
+import { useCategories } from '../hooks/useCategories';
 import { useMonths } from '../hooks/useMonths';
 import { copyFromMonth, saveMonth } from '../firebase/budget';
 import {
@@ -51,7 +51,7 @@ function NewMonthSheet({ open, onClose, existingIds, onCreated }: NewMonthSheetP
         await saveMonth(user.uid, selected, {
           monthId: selected,
           salary: 0,
-          expenses: { rent: 0, food: 0, travel: 0, bills: 0, misc: 0 },
+          expenses: {},
         });
       }
       onCreated(selected);
@@ -146,11 +146,13 @@ function NewMonthSheet({ open, onClose, existingIds, onCreated }: NewMonthSheetP
 
 export default function HistoryPage() {
   const navigate = useNavigate();
-  const { months, loading, error, reload } = useMonths();
+  const { months, loading: monthsLoading, error, reload } = useMonths();
+  const { categories, loading: catsLoading } = useCategories();
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const cur = currentMonthId();
   const existingIds = months.map((m) => m.monthId);
+  const loading = monthsLoading || catsLoading;
 
   return (
     <div className="min-h-dvh pb-28">
@@ -206,6 +208,7 @@ export default function HistoryPage() {
               <MonthCard
                 key={m.monthId}
                 month={m}
+                categories={categories}
                 isCurrent={m.monthId === cur}
               />
             ))}

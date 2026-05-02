@@ -1,22 +1,23 @@
 import { Link } from 'react-router-dom';
-import type { MonthData } from '../firebase/budget';
-import { CATEGORIES, totalExpenses } from '../lib/categories';
+import type { Category, MonthData } from '../firebase/budget';
+import { totalExpenses } from '../lib/categories';
 import { formatINR, pct } from '../lib/format';
 import { labelFromId } from '../lib/monthId';
 
 interface Props {
   month: MonthData;
+  categories: Category[];
   isCurrent?: boolean;
 }
 
-export default function MonthCard({ month, isCurrent }: Props) {
+export default function MonthCard({ month, categories, isCurrent }: Props) {
   const salary = Number(month?.salary) || 0;
   const total = totalExpenses(month?.expenses);
   const left = salary - total;
   const used = pct(total, salary);
-  const segments = CATEGORIES.map((c) => ({
+  const segments = categories.map((c) => ({
     color: c.color,
-    weight: Number(month?.expenses?.[c.key]) || 0,
+    weight: Number(month?.expenses?.[c.id]) || 0,
   })).filter((s) => s.weight > 0);
   const segTotal = segments.reduce((a, b) => a + b.weight, 0);
 
