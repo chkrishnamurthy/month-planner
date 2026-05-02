@@ -89,7 +89,7 @@ export default function EditMonthPage() {
 
   return (
     <div className="min-h-dvh pb-32">
-      <div className="mx-auto max-w-xl px-5">
+      <div className="mx-auto max-w-xl lg:max-w-5xl px-5">
         <AppHeader section="Edit plan" />
 
         <div className="mt-2 flex items-center justify-between">
@@ -124,67 +124,71 @@ export default function EditMonthPage() {
             <Spinner size={28} />
           </div>
         ) : (
-          <>
-            <section
-              className={`mt-5 card-hero p-6 ${
-                overBudget ? 'bg-red-950 text-red-100' : ''
-              }`}
-            >
-              <div className="label-eyebrow text-white/60">
-                {overBudget ? 'Over budget' : 'Remaining'}
-              </div>
-              <div
-                className={`mt-1 num text-5xl font-semibold tracking-tight ${
-                  overBudget ? 'text-red-300' : 'text-accent'
+          <div className="mt-5 lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start">
+            <div className="flex flex-col gap-5">
+              <section
+                className={`card-hero p-6 ${
+                  overBudget ? 'bg-red-950 text-red-100' : ''
                 }`}
               >
-                {formatINR(Math.abs(left))}
-              </div>
-              <div className="mt-1 text-sm text-white/65">
-                {formatINR(total)} planned · {formatINR(numericSalary)} salary
-              </div>
-            </section>
+                <div className="label-eyebrow text-white/60">
+                  {overBudget ? 'Over budget' : 'Remaining'}
+                </div>
+                <div
+                  className={`mt-1 num text-5xl font-semibold tracking-tight ${
+                    overBudget ? 'text-red-300' : 'text-accent'
+                  }`}
+                >
+                  {formatINR(Math.abs(left))}
+                </div>
+                <div className="mt-1 text-sm text-white/65">
+                  {formatINR(total)} planned · {formatINR(numericSalary)} salary
+                </div>
+              </section>
 
-            <section className="mt-5 card p-2 sm:p-3">
-              <div className="px-3 pt-3 label-eyebrow">Salary</div>
-              <label className="flex items-center gap-3 px-2 py-3">
-                <span className="w-10 h-10 rounded-xl grid place-items-center text-base shrink-0 bg-accent/30 text-accent-ink dark:text-accent">
-                  💰
-                </span>
-                <span className="flex-1 text-sm font-medium">Monthly salary</span>
-                <span className="flex items-center gap-1 rounded-2xl bg-line-light/60 dark:bg-line-dark px-3 py-2 focus-within:ring-2 focus-within:ring-accent">
-                  <span className="text-muted-light dark:text-muted-dark text-sm">
-                    ₹
+              <section className="card p-2 sm:p-3">
+                <div className="px-3 pt-3 label-eyebrow">Salary</div>
+                <label className="flex items-center gap-3 px-2 py-3">
+                  <span className="w-10 h-10 rounded-xl grid place-items-center text-base shrink-0 bg-accent/30 text-accent-ink dark:text-accent">
+                    💰
                   </span>
-                  <input
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    value={salary === 0 ? '' : salary}
-                    placeholder="0"
-                    onChange={handleSalary}
-                    className="w-28 sm:w-32 bg-transparent text-right text-base font-semibold num outline-none"
-                  />
-                </span>
-              </label>
-            </section>
-
-            <section className="mt-3 card p-2 sm:p-3">
-              <div className="px-3 pt-3 label-eyebrow">Categories</div>
-              <ul className="divide-y divide-line-light dark:divide-line-dark">
-                {CATEGORIES.map((c) => (
-                  <li key={c.key} className="px-2">
-                    <CategoryInput
-                      categoryKey={c.key}
-                      value={expenses[c.key]}
-                      onChange={(v) =>
-                        setExpenses((prev) => ({ ...prev, [c.key]: v }))
-                      }
+                  <span className="flex-1 text-sm font-medium">Monthly salary</span>
+                  <span className="flex items-center gap-1 rounded-2xl bg-line-light/60 dark:bg-line-dark px-3 py-2 focus-within:ring-2 focus-within:ring-accent">
+                    <span className="text-muted-light dark:text-muted-dark text-sm">
+                      ₹
+                    </span>
+                    <input
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      value={salary === 0 ? '' : salary}
+                      placeholder="0"
+                      onChange={handleSalary}
+                      className="w-28 sm:w-32 bg-transparent text-right text-base font-semibold num outline-none"
                     />
-                  </li>
-                ))}
-              </ul>
-            </section>
-          </>
+                  </span>
+                </label>
+              </section>
+            </div>
+
+            <div className="mt-5 lg:mt-0">
+              <section className="card p-2 sm:p-3">
+                <div className="px-3 pt-3 label-eyebrow">Categories</div>
+                <ul className="divide-y divide-line-light dark:divide-line-dark">
+                  {CATEGORIES.map((c) => (
+                    <li key={c.key} className="px-2">
+                      <CategoryInput
+                        categoryKey={c.key}
+                        value={expenses[c.key]}
+                        onChange={(v) =>
+                          setExpenses((prev) => ({ ...prev, [c.key]: v }))
+                        }
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            </div>
+          </div>
         )}
       </div>
 

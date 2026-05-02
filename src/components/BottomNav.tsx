@@ -42,7 +42,7 @@ const items: NavItem[] = [
 export default function BottomNav() {
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-30 border-t border-line-light dark:border-line-dark bg-bg-light/85 dark:bg-bg-dark/85 backdrop-blur-md"
+      className="fixed bottom-0 inset-x-0 z-30 border-t border-line-light dark:border-line-dark bg-bg-light/85 dark:bg-bg-dark/85 backdrop-blur-md md:hidden"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       <div className="mx-auto max-w-xl px-4 grid grid-cols-3">

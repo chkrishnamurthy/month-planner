@@ -1,14 +1,21 @@
-import { createContext, useContext, useMemo, type ReactNode } from 'react';
-
-export interface User {
-  uid: string;
-  displayName: string;
-  email: string;
-  photoURL?: string;
-}
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
+import {
+  type User,
+  onAuthStateChanged,
+  signInWithPopup,
+  signOut as fbSignOut,
+} from 'firebase/auth';
+import { auth, googleProvider } from '../firebase/config';
 
 interface AuthContextValue {
-  user: User;
+  user: User | null;
   loading: boolean;
   error: Error | null;
   signInWithGoogle: () => Promise<void>;
@@ -17,23 +24,44 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-// Mock user — no Firebase, no login required
-const MOCK_USER: User = {
-  uid: 'local-user',
-  displayName: 'You',
-  email: 'local@planner.app',
-};
-
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser]       = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState<Error | null>(null);
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(
+      auth,
+      (u) => {
+        setUser(u);
+        setLoading(false);
+      },
+      (err) => {
+        setError(err);
+        setLoading(false);
+      }
+    );
+    return unsub;
+  }, []);
+
   const value = useMemo<AuthContextValue>(
     () => ({
-      user: MOCK_USER,
-      loading: false,
-      error: null,
-      signInWithGoogle: async () => {},
-      signOut: async () => {},
+      user,
+      loading,
+      error,
+      signInWithGoogle: async () => {
+        setError(null);
+        try {
+          await signInWithPopup(auth, googleProvider);
+        } catch (err) {
+          const e = err instanceof Error ? err : new Error(String(err));
+          setError(e);
+          throw e;
+        }
+      },
+      signOut: () => fbSignOut(auth),
     }),
-    []
+    [user, loading, error]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

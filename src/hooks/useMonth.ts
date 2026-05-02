@@ -13,12 +13,15 @@ interface UseMonthResult {
 
 export function useMonth(monthId: string | undefined): UseMonthResult {
   const { user } = useAuth();
-  const [month, setMonth] = useState<MonthData | null>(null);
+  const [month, setMonth]   = useState<MonthData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError]   = useState<Error | null>(null);
 
   useEffect(() => {
-    if (!monthId) return;
+    if (!user || !monthId) {
+      setLoading(false);
+      return;
+    }
     let cancelled = false;
     setLoading(true);
     setError(null);
@@ -36,24 +39,25 @@ export function useMonth(monthId: string | undefined): UseMonthResult {
           setMonth(emptyMonth(monthId));
         }
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err : new Error(String(err)));
+        console.error('useMonth fetch error:', err);
+        if (!cancelled)
+          setError(err instanceof Error ? err : new Error(String(err)));
       } finally {
         if (!cancelled) setLoading(false);
       }
     })();
-    return () => {
-      cancelled = true;
-    };
-  }, [user.uid, monthId]);
+    return () => { cancelled = true; };
+  }, [user, monthId]);
 
   const save = useCallback(
     async (data: Partial<MonthData>): Promise<MonthData> => {
+      if (!user) throw new Error('Not authenticated');
       if (!monthId) throw new Error('No monthId');
       const saved = await saveMonth(user.uid, monthId, data);
       setMonth(saved);
       return saved;
     },
-    [user.uid, monthId]
+    [user, monthId]
   );
 
   return { month, loading, error, save };

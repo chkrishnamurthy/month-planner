@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppHeader from '../components/AppHeader';
-import BottomNav from '../components/BottomNav';
+
 import ErrorBanner from '../components/ErrorBanner';
 import MonthCard from '../components/MonthCard';
 import Spinner from '../components/Spinner';
@@ -41,6 +41,7 @@ function NewMonthSheet({ open, onClose, existingIds, onCreated }: NewMonthSheetP
   const sourceId = existingIds[0];
 
   const handleCreate = async () => {
+    if (!user) return;
     setBusy(true);
     setError(null);
     try {
@@ -153,7 +154,7 @@ export default function HistoryPage() {
 
   return (
     <div className="min-h-dvh pb-28">
-      <div className="mx-auto max-w-xl px-5">
+      <div className="mx-auto max-w-xl lg:max-w-5xl xl:max-w-7xl px-5">
         <AppHeader section="02 · History" />
 
         <div className="mt-4 flex items-end justify-between gap-4">
@@ -187,7 +188,7 @@ export default function HistoryPage() {
           <div className="mt-10 flex justify-center text-muted-light dark:text-muted-dark">
             <Spinner size={28} />
           </div>
-        ) : months.length === 0 ? (
+        ) : error ? null : months.length === 0 ? (
           <div className="mt-10 card p-6 text-center">
             <p className="text-muted-light dark:text-muted-dark">
               No months yet. Create your first plan to get started.
@@ -200,7 +201,7 @@ export default function HistoryPage() {
             </button>
           </div>
         ) : (
-          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-3">
             {months.map((m) => (
               <MonthCard
                 key={m.monthId}
@@ -221,7 +222,7 @@ export default function HistoryPage() {
           reload().then(() => navigate(`/edit/${id}`));
         }}
       />
-      <BottomNav />
+
     </div>
   );
 }

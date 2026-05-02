@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import AppHeader from '../components/AppHeader';
-import BottomNav from '../components/BottomNav';
+
 import CategoryTrendCard from '../components/CategoryTrendCard';
 import ErrorBanner from '../components/ErrorBanner';
 import Spinner from '../components/Spinner';
@@ -21,8 +21,7 @@ interface SixMonthEntry {
 }
 
 export default function InsightsPage() {
-  const { months } = useMonths();
-  const { loading, error } = useMonths();
+  const { months, loading, error } = useMonths();
 
   const cur = currentMonthId();
   const sixIds = useMemo(() => lastNMonthIds(6), []);
@@ -55,7 +54,7 @@ export default function InsightsPage() {
 
   return (
     <div className="min-h-dvh pb-28">
-      <div className="mx-auto max-w-xl px-5">
+      <div className="mx-auto max-w-xl lg:max-w-5xl px-5">
         <AppHeader section="03 · Insights" />
 
         <div className="mt-4">
@@ -75,73 +74,83 @@ export default function InsightsPage() {
           <div className="mt-10 flex justify-center text-muted-light dark:text-muted-dark">
             <Spinner size={28} />
           </div>
-        ) : !latest ? (
+        ) : error ? null : !latest ? (
           <div className="mt-10 card p-6 text-center text-muted-light dark:text-muted-dark">
             No data yet. Save a month to see insights.
           </div>
         ) : (
-          <>
-            <section className="mt-6 card-hero p-6">
-              <div className="label-eyebrow text-white/60">
-                Savings rate · {labelFromId(latestId)}
-              </div>
-              <div className="mt-3 flex items-end gap-1">
-                <span className="num text-7xl sm:text-8xl font-semibold text-accent leading-[0.9] tracking-tight">
-                  {saveRate}
-                </span>
-                <span className="text-3xl font-semibold text-accent leading-none mb-2">
-                  %
-                </span>
-              </div>
-              <div className="mt-5 grid grid-cols-2 gap-4">
-                <div>
-                  <div className="label-eyebrow text-white/60">Saved</div>
-                  <div className="num text-xl font-semibold text-white">
-                    {formatCompactINR(latestSaved)}
+          <div className="mt-6 lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start">
+            <div className="flex flex-col gap-5">
+              <section className="card-hero p-6">
+                <div className="label-eyebrow text-white/60">
+                  Savings rate · {labelFromId(latestId)}
+                </div>
+                <div className="mt-3 flex items-end gap-1">
+                  <span className="num text-7xl sm:text-8xl font-semibold text-accent leading-[0.9] tracking-tight">
+                    {saveRate}
+                  </span>
+                  <span className="text-3xl font-semibold text-accent leading-none mb-2">
+                    %
+                  </span>
+                </div>
+                <div className="mt-5 grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="label-eyebrow text-white/60">Saved</div>
+                    <div className="num text-xl font-semibold text-white">
+                      {formatCompactINR(latestSaved)}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="label-eyebrow text-white/60">Spent</div>
+                    <div className="num text-xl font-semibold text-white">
+                      {formatCompactINR(latestSpent)}
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <div className="label-eyebrow text-white/60">Spent</div>
-                  <div className="num text-xl font-semibold text-white">
-                    {formatCompactINR(latestSpent)}
+              </section>
+
+              <div className="hidden lg:block">
+                <ProfileRow />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-5 mt-5 lg:mt-0">
+              <section className="card p-5 sm:p-6">
+                <div className="flex items-baseline justify-between">
+                  <div>
+                    <div className="text-sm font-semibold">Total allocated</div>
                   </div>
+                  <div className="label-eyebrow">6 months</div>
                 </div>
-              </div>
-            </section>
-
-            <section className="mt-4 card p-5 sm:p-6">
-              <div className="flex items-baseline justify-between">
-                <div>
-                  <div className="text-sm font-semibold">Total allocated</div>
+                <div className="mt-3">
+                  <TotalAllocatedBars data={six} currentId={latestId} />
                 </div>
-                <div className="label-eyebrow">6 months</div>
-              </div>
-              <div className="mt-3">
-                <TotalAllocatedBars data={six} currentId={latestId} />
-              </div>
-            </section>
+              </section>
 
-            <section className="mt-4">
-              <div className="flex items-baseline justify-between mb-3">
-                <div className="text-sm font-semibold">Category trends</div>
-                <div className="label-eyebrow">vs last month</div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {CATEGORIES.map((c) => (
-                  <CategoryTrendCard
-                    key={c.key}
-                    categoryKey={c.key}
-                    series={six.map((m) => Number(m.expenses?.[c.key]) || 0)}
-                  />
-                ))}
-              </div>
-            </section>
+              <section>
+                <div className="flex items-baseline justify-between mb-3">
+                  <div className="text-sm font-semibold">Category trends</div>
+                  <div className="label-eyebrow">vs last month</div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {CATEGORIES.map((c) => (
+                    <CategoryTrendCard
+                      key={c.key}
+                      categoryKey={c.key}
+                      series={six.map((m) => Number(m.expenses?.[c.key]) || 0)}
+                    />
+                  ))}
+                </div>
+              </section>
 
-            <ProfileRow />
-          </>
+              <div className="lg:hidden">
+                <ProfileRow />
+              </div>
+            </div>
+          </div>
         )}
       </div>
-      <BottomNav />
+
     </div>
   );
 }
