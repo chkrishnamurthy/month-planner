@@ -25,12 +25,11 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const API = getApiBaseUrl();
-
 async function syncUserToDB(user: User): Promise<void> {
   try {
+    const api = getApiBaseUrl();
     const token = await user.getIdToken();
-    await fetch(`${API}/users/me`, {
+    await fetch(`${api}/users/me`, {
       headers: { Authorization: `Bearer ${token}` },
     });
   } catch {

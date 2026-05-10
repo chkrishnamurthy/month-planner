@@ -36,12 +36,10 @@ export const emptyMonth = (monthId: string): MonthData => ({
 
 // ─── HTTP client ──────────────────────────────────────────────────────────────
 
-const API = getApiBaseUrl();
-
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const token = await auth.currentUser?.getIdToken();
   if (!token) throw new Error('Not authenticated');
-  const res = await fetch(`${API}${path}`, {
+  const res = await fetch(`${getApiBaseUrl()}${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
